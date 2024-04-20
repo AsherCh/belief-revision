@@ -137,7 +137,7 @@ class BeliefBasePriority:
                         bracket_break = -1
                         for k in range(j+2, len(belief)):
                             if bracket == 0:
-                                bracket_break = k
+                                bracket_break = k  #denotes the index where the inital "(" is closed ")"
                                 break
                             if belief[k] == "(":
                                 bracket -= 1
