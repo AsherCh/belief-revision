@@ -36,6 +36,9 @@ class BeliefBasePriority:
         # replace implication with disjunction
         self.replace_implication()
 
+        # resolve negation before ()
+        self.resolve_negation()
+
 
     def print_as_conjunction(self):
         cnf = ""
@@ -124,6 +127,48 @@ class BeliefBasePriority:
                 belief = self.beliefs[i][1]
         self.print_as_conjunction()
 
+    def resolve_negation(self):
+        for i, (priority, belief) in enumerate(self.beliefs):
+            if "~" in belief:
+                # iterate from right to left
+                for j in range(len(belief)-1, -1, -1):
+                    if belief[j] == "~" and belief[j+1] == "(":
+                        bracket = -1
+                        bracket_break = -1
+                        for k in range(j+2, len(belief)):
+                            if bracket == 0:
+                                bracket_break = k
+                                break
+                            if belief[k] == "(":
+                                bracket -= 1
+                            if belief[k] == ")":
+                                bracket += 1
+                        bracket_break -= 1
+                        # save into to_negate string between j+2 and bracket_break
+                        # this string should not include the beginning and ending brackets
+                        # just j to skip the "~"
+                        before_negate = belief[:j]
+                        to_negate = belief[j+1:bracket_break+1]
+                        # +1 to skip the ")"
+                        after_negate = belief[bracket_break+1:]
+
+                        # in to_negate, replace "&" with "|", and vice versa
+                        to_negate = to_negate.replace("&", "temp")
+                        to_negate = to_negate.replace("|", "&")
+                        to_negate = to_negate.replace("temp", "|")
+                        # check if character is a letter
+                        # if it is, add "~" before it
+                        negated = ""
+                        for char in to_negate:
+                            if char.isalpha():
+                                negated += "~" + char
+                            else:
+                                negated += char
+
+                        to_negate = negated
+
+                        self.beliefs[i] = (priority, f"{before_negate}{to_negate}{after_negate}")
+        self.print_as_conjunction()
 
 
 # Example usage:
