@@ -39,6 +39,18 @@ class BeliefBasePriority:
         # resolve negation before ()
         self.resolve_negation()
 
+        # remove redundant brackets in the beginning and end
+        self.remove_brackets()
+
+        # split beliefs with conjunctions into two beliefs
+        self.split_conjunctions()
+
+        # apply associative law (a | (b | c)) -> ((a | b) | c) -> (a | b | c)
+        self.apply_associative_law()
+
+        # apply distributive law (a | (b & c)) -> ((a | b) & (a | c))
+        self.apply_distributive_law()
+
 
     def print_as_conjunction(self):
         cnf = ""
@@ -170,6 +182,116 @@ class BeliefBasePriority:
                         self.beliefs[i] = (priority, f"{before_negate}{to_negate}{after_negate}")
         self.print_as_conjunction()
 
+    def remove_brackets(self):
+        for i, (priority, belief) in enumerate(self.beliefs):
+            valid = True
+            while belief[0] == "(" and belief[-1] == ")" and valid:
+                # remove brackets from the beginning and end
+                belief = belief[1:-1]
+                # check for validity
+                # iterate over belief, if at any point there are more ) than (, set valid to False
+                bracket = 0
+                for char in belief:
+                    if bracket < 0:
+                        valid = False
+                        # put the brackets back
+                        belief = f"({belief})"
+                        break
+                    if char == "(":
+                        bracket += 1
+                    if char == ")":
+                        bracket -= 1
+            self.beliefs[i] = (priority, belief)
+        self.print_as_conjunction()
+
+    def remove_brackets_from_string(self, belief):
+        valid = True
+        while belief[0] == "(" and belief[-1] == ")" and valid:
+            # remove brackets from the beginning and end
+            belief = belief[1:-1]
+            # check for validity
+            # iterate over belief, if at any point there are more ) than (, set valid to False
+            bracket = 0
+            for char in belief:
+                if bracket < 0:
+                    valid = False
+                    # put the brackets back
+                    belief = f"({belief})"
+                    break
+                if char == "(":
+                    bracket += 1
+                if char == ")":
+                    bracket -= 1
+        return belief
+
+    def split_conjunctions(self):
+        for i, (priority, belief) in enumerate(self.beliefs):
+            if "&" in belief:
+                # iterate over belief
+                should_iterate = True
+                # if any & gets replaced by *, iterate again from the beginning after running through the whole belief
+                # ex. ((p|q)&r)&(p|q) -> ((p|q)&r)*(p|q)
+                while(should_iterate):
+                    should_iterate = False
+                    for (index, char) in enumerate(belief):
+                        if char == "&":
+                            # split belief into two beliefs
+                            a, b = belief.split("&", 1)
+                            # if "a" includes character "*" then cut a only to the last "*"
+                            if "*" in a:
+                                a = a.rsplit("*", 1)[-1]
+                            if "*" in b:
+                                b = b.split("*", 1)[0]
+                            # count the number of brackets before and after the "&" (until the potential *)
+                            a = self.remove_brackets_from_string(a)
+                            b = self.remove_brackets_from_string(b)
+                            if a.count("(") - a.count(")") == 0 and b.count("(") - b.count(")") == 0:
+                                belief = self.replace_char_at_index(belief, index, "*")  # replace & at index by *
+                                should_iterate = True
+            # in every cell, if there is a "*"
+            # split the cell there and add the two new beliefs to the list and remove the old one
+            while "*" in belief:
+                a, b = belief.split("*", -1)
+                self.beliefs[i] = (priority, a)
+                self.beliefs.append((priority, b))
+                belief = a
+
+    def replace_char_at_index(self, org_str, index, replacement):
+        new_str = org_str[:index] + replacement + org_str[index + 1:]
+        return new_str
+
+    def apply_associative_law(self):
+        for i, (priority, belief) in enumerate(self.beliefs):
+            if "|" in belief and "&" not in belief:
+                # remove all brackets from belief
+                belief = belief.replace("(", "")
+                belief = belief.replace(")", "")
+                self.beliefs[i] = (priority, belief)
+        self.print_as_conjunction()
+
+    def apply_distributive_law(self):
+        for i, (priority, belief) in enumerate(self.beliefs):
+            if "|" in belief and "&" in belief:
+                # iterate over belief
+                should_iterate = True
+                # if any & gets replaced by *, iterate again from the beginning after running through the whole belief
+                # ex. ((p|q)&r)&(p|q) -> ((p|q)&r)*(p|q)
+                while(should_iterate):
+                    should_iterate = False
+                    for (index, char) in enumerate(belief):
+                        if char == "|":
+                            # split belief into two beliefs
+                            a, b = belief.split("|", 1)
+                            # if "a" includes character "*" then cut a only to the last "*"
+                            if "*" in a:
+                                a = a.rsplit("*", 1)[-1]
+                            if "*" in b:
+                                b = b.split("*", 1)[0]
+                            # count the number of brackets before and after the "&" (until the potential *)
+                            a = self.remove_brackets_from_string(a)
+                            b = self.remove_brackets_from_string(b)
+                            if a.count("(") - a.count(")") == 0 and b.count("(") - b.count(")") == 0:
+                                belief = self.replace_char_at_index(belief, index, "*")
 
 # Example usage:
 bbp = BeliefBasePriority()
