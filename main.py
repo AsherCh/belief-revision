@@ -13,6 +13,6 @@ if __name__ == "__main__":
             get_expression()
 
     print("Enter your belief")
-    expression = get_expression()
+    expression = get_expression()  # Use this funcction to get the expression
 
     print("the expression you entered is valid", expression)
