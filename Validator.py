@@ -34,15 +34,18 @@ class Validator:
         Validates and returns the expression if it is correct, otherwise returns an error message.
         """
         if not self.check_parentheses(expression):
-            return "Invalid expression: Mismatched or improperly nested parentheses"
+            print("Invalid expression: Mismatched or improperly nested parentheses")
+            return False
 
         try:
             self.expr.parseString(expression, parseAll=True)
             return expression
         except ParseException as pe:
-            return f"Invalid expression: {pe}"
+            print(f"Invalid expression: {pe}")
+            return False
         except Exception as e:
-            return f"Invalid expression: {str(e)}"
+            print(f"Invalid expression: {str(e)}")
+            return False
 
     def check_parentheses(self, s):
         """

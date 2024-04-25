@@ -10,7 +10,7 @@ if __name__ == "__main__":
             return exp
         else:
             print("Enter the expression")
-            get_expression()
+            return get_expression()
 
     print("Enter your belief")
     expression = get_expression()  # Use this funcction to get the expression
