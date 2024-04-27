@@ -70,6 +70,13 @@ class BeliefBasePriority:
 
         return self.belief_base_as_conjunction(to_convert)
 
+    def is_subset_of(self, another_belief_base):
+        # for each belief in self.beliefs, check if it is in another_belief_base
+        for _, belief in self.beliefs:
+            if not another_belief_base.is_in_belief_base(belief):
+                return False
+        return True
+
         # # resolve negation before ()
         # self.resolve_negation()
         #
