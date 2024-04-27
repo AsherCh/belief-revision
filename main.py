@@ -1,6 +1,7 @@
 from Validator import *
 from belief_base import *
 from expansion import *
+from entailment import *
 
 
 if __name__ == "__main__":
