@@ -1,4 +1,6 @@
 from Validator import *
+from belief_base import *
+from expansion import *
 
 
 if __name__ == "__main__":
@@ -15,9 +17,12 @@ if __name__ == "__main__":
     print("Belief revision system")
     print("Enter your initial belief:")
     expression = get_expression()  # Use this function to get the expression
+    # create a new BeliefBasePriority object with the initial belief
+    belief_base = BeliefBasePriority()
+    belief_base.add_belief(expression, 1)
 
     while 1:
-        print("What would you like to do? Enter an integer (1-3)")
+        print("\nWhat would you like to do? Enter an integer (1-3)")
         print("1 - Check logical entailment")
         print("2 - Contraction of belief base")
         print("3 - Expansion of belief base")
@@ -43,7 +48,7 @@ if __name__ == "__main__":
 
         print(text)
         # this should also validate the input
-        expression = get_expression()
+        new_belief = get_expression()
 
         if choice == 1:
             print("Checking for logical entailment")
@@ -54,8 +59,10 @@ if __name__ == "__main__":
             # contraction of belief base
 
         else:
-            print("Expansion of belief base")
             # expansion of belief base
+            belief_base = expand(belief_base, new_belief)
+            print("Belief base after expansion:")
+            belief_base.print_beliefs()
 
     #print("the expression you entered is valid", expression)
 

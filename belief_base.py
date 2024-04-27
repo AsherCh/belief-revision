@@ -1,4 +1,5 @@
 import heapq
+from sympy.logic.boolalg import to_cnf
 
 class BeliefBasePriority:
     def __init__(self):
@@ -26,118 +27,147 @@ class BeliefBasePriority:
         for priority,  belief in self.beliefs:
             print(f"- Priority {priority}: {belief}")
 
-    def to_cnf(self):
-        print("Belief Base in CNF:")
-        self.print_as_conjunction()
-
-        # replace bi-implication with conjunction of implications
-        self.replace_bi_implication()
-
-        # replace implication with disjunction
-        self.replace_implication()
-
-        # resolve negation before ()
-        self.resolve_negation()
-
-        # remove redundant brackets in the beginning and end
-        self.remove_brackets()
-
-        # split beliefs with conjunctions into two beliefs
-        self.split_conjunctions()
-
-        # apply associative law (a | (b | c)) -> ((a | b) | c) -> (a | b | c)
-        self.apply_associative_law()
-
-        # apply distributive law (a | (b & c)) -> ((a | b) & (a | c))
-        self.apply_distributive_law()
-
-
-    def print_as_conjunction(self):
+    def belief_base_as_conjunction(self, belief_base):
         cnf = ""
-        for i, (priority, belief) in enumerate(self.beliefs):
-            if i == len(self.beliefs) - 1:
+        for i, (priority, belief) in enumerate(belief_base):
+            if i == len(belief_base) - 1:
                 # concatenate to cnf
                 cnf += "(" + belief + ")"
             else:
                 cnf += "(" + belief + ")&"
-        print(cnf)
+        return cnf
 
-    def replace_bi_implication(self):
-        for i, (priority, belief) in enumerate(self.beliefs):
+    def is_in_belief_base(self, expression):
+        expression_cnf = to_cnf(expression, True)
+        belief_base_cnf = to_cnf(self.belief_base_to_cnf_friendly(self.beliefs), True)
+        # cast expression_cnf and belief_base_cnf to string
+        expression_cnf = str(expression_cnf)
+        belief_base_cnf = str(belief_base_cnf)
+        # remove the character ' ' from the strings
+        expression_cnf = expression_cnf.replace(" ", "")
+        belief_base_cnf = belief_base_cnf.replace(" ", "")
+        # split expression_cnf and belief_base_cnf to an array, separated by "&"
+        expression_cnf_split = expression_cnf.split("&")
+        belief_base_cnf_split = belief_base_cnf.split("&")
+        # loop through the expression_cnf_split
+        for exp in expression_cnf_split:
+            # check if the expression is in belief_base_cnf_split
+            if exp not in belief_base_cnf_split:
+                return False
+        return True
+
+    def get_last_priority(self):
+        return self.beliefs[-1][0]
+
+    def belief_base_to_cnf_friendly(self, belief_base):
+        to_convert = belief_base
+
+        # replace bi-implication with conjunction of implications
+        to_convert = self.replace_bi_implication(to_convert)
+
+        # replace implication with disjunction
+        to_convert = self.replace_implication(to_convert)
+
+        return self.belief_base_as_conjunction(to_convert)
+
+        # # resolve negation before ()
+        # self.resolve_negation()
+        #
+        # # remove redundant brackets in the beginning and end
+        # self.remove_brackets()
+        #
+        # # split beliefs with conjunctions into two beliefs
+        # self.split_conjunctions()
+        #
+        # # apply associative law (a | (b | c)) -> ((a | b) | c) -> (a | b | c)
+        # self.apply_associative_law()
+        #
+        # # apply distributive law (a | (b & c)) -> ((a | b) & (a | c))
+        # self.apply_distributive_law()
+
+    def replace_bi_implication(self, belief_base):
+        for i, (priority, belief) in enumerate(belief_base):
             if "<->" in belief:
                 # split bi-implication into two implications
                 a, b = belief.split("<->")
-                self.beliefs[i] = (priority, f"({a}->{b})&({b}->{a})")
-        self.print_as_conjunction()
+                belief_base[i] = (priority, f"({a}->{b})&({b}->{a})")
+        return belief_base
 
-    def replace_implication(self):
-        for i, (priority, belief) in enumerate(self.beliefs):
-            # while there is "->" in belief, replace by disjunction
+    def replace_implication(self, belief_base):
+        for i, (priority, belief) in enumerate(belief_base):
+            # replace "->" with ">>"
+            belief_base[i] = (priority, belief.replace("->", ">>"))
 
-            while "->" in belief:
-                # split implication into two parts, finding the first occurrence of "->"
-                a, b = belief.split("->", 1)
+        return belief_base
 
-                # if b has more than one character, it should go into ()
-                # example: "a -> b & c" -> "a -> (b & c)" -> "~a | (b & c)"
-                # & has priority over ->, priority should be kept when changing -> to |
-                # if b is more than one character and has no brackets, add brackets
-                # if first character of b is not "("
-                # if b has any character from the set {"&", "|"}
-
-                if len(b) > 1:
-                    # iterate over a from right to left
-                    bracket = 0
-                    bracket_break = len(b)
-
-                    for j, char in enumerate(b):
-                        if bracket < 0:
-                            bracket_break = j
-                            break
-                        if b[j] == "(":
-                            bracket += 1
-                        if b[j] == ")":
-                            bracket -= 1
-                    bracket_break -= 1
-                    # save a before bracket_break and after bracket_break index into separate variables
-                    b_before = b[:bracket_break]
-                    b_after = b[bracket_break:]
-
-                if ("&" in b_before or "|" in b_before) and (b_before[0] != "(" and b_before[-1] != ")"):
-                    b_before = f"({b_before})"
-                    b = f"{b_before}{b_after}"
-
-
-                # if a has more than one character
-                if len(a) > 1:
-                    # iterate over a from right to left
-                    bracket = 0
-                    bracket_break = -1
-                    for j in range(len(a)-1, -1, -1):
-                        if bracket < 0:
-                            bracket_break = j
-                            break
-                        if a[j] == "(":
-                            bracket -= 1
-                        if a[j] == ")":
-                            bracket += 1
-                    bracket_break += 2
-                    # save a before bracket_break and after bracket_break index into separate variables
-                    a_before = a[:bracket_break]
-                    a_after = a[bracket_break:]
-
-                    if (a_after[0] == "(" and a_after[-1] == ")") or len(a_after) == 1:
-                        self.beliefs[i] = (priority, f"{a_before}~{a_after}|{b}")
-
-                    # adding brakcets before and after a if there are any
-                    # example: a = "p&q" -> "(p&q)"
-                    # check if there are any ")" in a
-                    else:
-                        self.beliefs[i] = (priority, f"{a_before}~({a_after})|{b}")
-                else:
-                    self.beliefs[i] = (priority, f"~{a}|{b}")
-                belief = self.beliefs[i][1]
-        self.print_as_conjunction()
+    # def replace_implication(self, belief_base):
+    #     for i, (priority, belief) in enumerate(belief_base):
+    #         # while there is "->" in belief, replace by disjunction
+    #
+    #         while "->" in belief:
+    #             # split implication into two parts, finding the first occurrence of "->"
+    #             a, b = belief.split("->", 1)
+    #
+    #             # if b has more than one character, it should go into ()
+    #             # example: "a -> b & c" -> "a -> (b & c)" -> "~a | (b & c)"
+    #             # & has priority over ->, priority should be kept when changing -> to |
+    #             # if b is more than one character and has no brackets, add brackets
+    #             # if first character of b is not "("
+    #             # if b has any character from the set {"&", "|"}
+    #
+    #             if len(b) > 1:
+    #                 # iterate over a from right to left
+    #                 bracket = 0
+    #                 bracket_break = len(b)
+    #
+    #                 for j, char in enumerate(b):
+    #                     if bracket < 0:
+    #                         bracket_break = j
+    #                         break
+    #                     if b[j] == "(":
+    #                         bracket += 1
+    #                     if b[j] == ")":
+    #                         bracket -= 1
+    #                 bracket_break -= 1
+    #                 # save a before bracket_break and after bracket_break index into separate variables
+    #                 b_before = b[:bracket_break]
+    #                 b_after = b[bracket_break:]
+    #
+    #             if ("&" in b_before or "|" in b_before) and (b_before[0] != "(" and b_before[-1] != ")"):
+    #                 b_before = f"({b_before})"
+    #                 b = f"{b_before}{b_after}"
+    #
+    #
+    #             # if a has more than one character
+    #             if len(a) > 1:
+    #                 # iterate over a from right to left
+    #                 bracket = 0
+    #                 bracket_break = -1
+    #                 for j in range(len(a)-1, -1, -1):
+    #                     if bracket < 0:
+    #                         bracket_break = j
+    #                         break
+    #                     if a[j] == "(":
+    #                         bracket -= 1
+    #                     if a[j] == ")":
+    #                         bracket += 1
+    #                 bracket_break += 2
+    #                 # save a before bracket_break and after bracket_break index into separate variables
+    #                 a_before = a[:bracket_break]
+    #                 a_after = a[bracket_break:]
+    #
+    #                 if (a_after[0] == "(" and a_after[-1] == ")") or len(a_after) == 1:
+    #                     belief_base[i] = (priority, f"{a_before}~{a_after}|{b}")
+    #
+    #                 # adding brakcets before and after a if there are any
+    #                 # example: a = "p&q" -> "(p&q)"
+    #                 # check if there are any ")" in a
+    #                 else:
+    #                     belief_base[i] = (priority, f"{a_before}~({a_after})|{b}")
+    #             else:
+    #                 belief_base[i] = (priority, f"~{a}|{b}")
+    #             belief = belief_base[i][1]
+    #     return belief_base
 
     def resolve_negation(self):
         for i, (priority, belief) in enumerate(self.beliefs):
@@ -294,17 +324,17 @@ class BeliefBasePriority:
                                 belief = self.replace_char_at_index(belief, index, "*")
 
 # Example usage:
-bbp = BeliefBasePriority()
-# bbp.add_belief("p", priority=2)
-# bbp.add_belief("q", priority=1)
-bbp.add_belief("p->q", priority=3)
-bbp.add_belief("p<->q", priority=2)
-bbp.add_belief("p&r<->q", priority=2)
-bbp.add_belief("(p&r)<->q", priority=2)
-
-bbp.to_cnf()
-
-#print("Querying belief 'p':", bbp.query_belief("p"))
-#print("Querying belief 'p->q':", bbp.query_belief("p->q"))
-#bbp.remove_belief("q")
-#bbp.to_cnf()
+# bbp = BeliefBasePriority()
+# # bbp.add_belief("p", priority=2)
+# # bbp.add_belief("q", priority=1)
+# bbp.add_belief("p->q", priority=3)
+# bbp.add_belief("p<->q", priority=2)
+# bbp.add_belief("p&r<->q", priority=2)
+# bbp.add_belief("(p&r)<->q", priority=2)
+#
+# bbp.to_cnf()
+#
+# #print("Querying belief 'p':", bbp.query_belief("p"))
+# #print("Querying belief 'p->q':", bbp.query_belief("p->q"))
+# #bbp.remove_belief("q")
+# #bbp.to_cnf()
