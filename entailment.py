@@ -16,10 +16,9 @@ def entailment(base,new_belief):
     ## Generate a set of clauses and remove "&"
     for f in base:
         clauses += conjuncts(f)
-    print("clauses:",clauses)
     ## Add the negative new belief to clauses
-    clauses += conjuncts(to_cnf(~new_belief))
-    print("clauses+(~new_belief):",clauses)
+    #clauses += conjuncts(to_cnf(~new_belief))
+    clauses += conjuncts(to_cnf(~to_cnf(new_belief)))
     new_clauses = set()
     while True:
         for clause1 in clauses:
