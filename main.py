@@ -53,6 +53,9 @@ if __name__ == "__main__":
         if choice == 1:
             print("Checking for logical entailment")
             # check for logical entailment
+            belief_base = entailment(belief_base, new_belief)
+            print("Belief base after entailment:")
+            belief_base.print_beliefs()
 
         elif choice == 2:
             print("Contraction of belief base")
