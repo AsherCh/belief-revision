@@ -20,8 +20,9 @@ if __name__ == "__main__":
     expression = get_expression()  # Use this function to get the expression
     # create a new BeliefBasePriority object with the initial belief
     belief_base = BeliefBasePriority()
-    belief_base.add_belief(expression, 1)
-
+    #belief_base.add_belief(expression, 1)
+    belief_base.add_belief(to_cnf(expression), 1)
+    
     while 1:
         print("\nWhat would you like to do? Enter an integer (1-3)")
         print("1 - Check logical entailment")
@@ -53,10 +54,14 @@ if __name__ == "__main__":
 
         if choice == 1:
             print("Checking for logical entailment")
+            base=[]
+            for priority, belief in belief_base.beliefs:
+                    base += [belief]
             # check for logical entailment
-            belief_base = entailment(belief_base, new_belief)
-            print("Belief base after entailment:")
-            belief_base.print_beliefs()
+            if entailment(base,new_belief):   
+                print ("Belief_base can entail new_belief")
+            else:
+                print ("Belief_base doesn't entail new_belief")
 
         elif choice == 2:
             print("Contraction of belief base")
