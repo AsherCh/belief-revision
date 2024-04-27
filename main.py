@@ -56,7 +56,7 @@ if __name__ == "__main__":
             print("Checking for logical entailment")
             base=[]
             for priority, belief in belief_base.beliefs:
-                    base += [belief]
+                    base += [to_cnf(belief)]
             # check for logical entailment
             if entailment(base,new_belief):   
                 print ("Belief_base can entail new_belief")
