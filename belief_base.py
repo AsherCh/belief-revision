@@ -38,7 +38,7 @@ class BeliefBasePriority:
         return cnf
 
     def is_in_belief_base(self, expression):
-        expression_cnf = to_cnf(expression, True)
+        expression_cnf = to_cnf(self.belief_base_to_cnf_friendly(expression), True)
         belief_base_cnf = to_cnf(self.belief_base_to_cnf_friendly(self.beliefs), True)
         # cast expression_cnf and belief_base_cnf to string
         expression_cnf = str(expression_cnf)
