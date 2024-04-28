@@ -2,12 +2,14 @@ from sympy.logic.boolalg import Or, And, Implies
 from sympy.logic.boolalg import to_cnf
 from sympy.logic.inference import satisfiable
 from sympy.abc import Q, P, R, C, A, B, D, i
+from AGM_postulate_consistency import *
+from AGM_postulates_contraction import *
 
 
 
 def contract(belief_base, new_belief):
 
-    if belief_base.AGM_postulate_consistency.is_consistent(belief_base):
+    if is_consistent(belief_base):   # first to find out if my base is consistent
     # check if the new_belief is already in the belief base
         if belief_base.is_in_belief_base(new_belief):
         
@@ -17,7 +19,7 @@ def contract(belief_base, new_belief):
 
         else:
             # else, return the base as it is.
-            belief_base.AGM_postulates_contraction.is_vacuity(belief_base,new_belief)
+            #is_vacuity(belief_base,new_belief)  #AGM postulate check
             print("The Belief to Contract is not found in Belief Base, Vacuity Postulate Satisfied")
             pass
         return belief_base
