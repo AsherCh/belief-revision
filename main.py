@@ -21,7 +21,6 @@ if __name__ == "__main__":
     # create a new BeliefBasePriority object with the initial belief
     belief_base = BeliefBasePriority()
     belief_base.add_belief(expression, 1)
-    #belief_base.add_belief(to_cnf(expression), 1)
     
     while 1:
         print("\nWhat would you like to do? Enter an integer (1-3)")
