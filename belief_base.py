@@ -4,9 +4,32 @@ from sympy.logic.boolalg import to_cnf
 class BeliefBasePriority:
     def __init__(self):
         self.beliefs = []
+        self.neo_beliefs = [] #used to store beliefs after Contraction 
 
     def add_belief(self, belief, priority):
         heapq.heappush(self.beliefs, (priority, belief))
+
+    def add_neo_belief(self, belief, priority):      #to add the remainaing beliefs after Contraction
+        heapq.heappush(self.neo_beliefs, (priority, belief))
+
+    def find_Contracting_belief(self,belief,contract_belief):     # Version 1 of Contraction, which creates a new belief base after contraction
+        for priority,  belief in self.beliefs:
+            if belief.is_in_belief_base(contract_belief):
+                print(f"The belief {contract_belief} is contracted from the belief base")
+            else:
+                belief.add_neo_belief(self, belief, priority)
+                pass
+        return belief
+        belief.print_Neo_belief(self,contract_belief) 
+
+    def V2_find_Contracting_belief(self,belief,contract_belief):   # Version 2 of COntraction, which removes the contracting belief and returns the modified belief base
+        for belief in self.beliefs:
+            if belief.is_in_belief_base(contract_belief):
+                belief.remove_belief(self,belief)
+                print(f"The belief {contract_belief} is contracted from the belief base")
+            else:
+                pass
+        return belief       
 
     def remove_belief(self, belief):
         for i, (p, b) in enumerate(self.beliefs):
@@ -25,6 +48,11 @@ class BeliefBasePriority:
     def print_beliefs(self):
         print("Belief Base with Priority Order:")
         for priority,  belief in self.beliefs:
+            print(f"- Priority {priority}: {belief}")
+
+    def print_Neo_beliefs(self,contract_belief):
+        print("Belief Base after Contraction of ",contract_belief)
+        for priority,  belief in self.neo_beliefs:
             print(f"- Priority {priority}: {belief}")
 
     def belief_base_as_conjunction(self, belief_base):
