@@ -80,7 +80,7 @@ class BeliefBasePriority:
         # loop through the expression_cnf_split
         for exp in expression_cnf_split:
             # check if the expression is in belief_base_cnf_split
-            if exp not in belief_base_cnf_split:
+            if exp not in belief_base_cnf_split and "(" + exp + ")" not in belief_base_cnf_split:
                 return False
         return True
 
