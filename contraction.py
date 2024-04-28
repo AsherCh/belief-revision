@@ -12,6 +12,7 @@ def contract(belief_base, new_belief):
         if belief_base.is_in_belief_base(new_belief):
         
             #belief_base.find_Contracting_belief(belief_base,new_belief)   #version 1 creates a new belief base after contraction
+            #belief_base.print_Neo_beliefs(belief_base,new_belief)         #To print results after version 1 contraction
             belief_base.V2_find_Contracting_belief(belief_base,new_belief) #version 2 updates exisitng belief base after contraction
 
         else:
