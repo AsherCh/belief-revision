@@ -2,7 +2,7 @@ from Validator import *
 from belief_base import *
 from expansion import *
 from entailment import *
-
+from contraction import *
 
 if __name__ == "__main__":
     validator = Validator()
@@ -65,6 +65,9 @@ if __name__ == "__main__":
         elif choice == 2:
             print("Contraction of belief base")
             # contraction of belief base
+            belief_base = contract(belief_base, new_belief)
+            print("Belief base after contraction:")
+            belief_base.print_beliefs()
 
         else:
             # expansion of belief base
