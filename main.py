@@ -1,8 +1,6 @@
 from Validator import *
-from belief_base import *
 from expansion import *
 from entailment import *
-from entailment_consist import *
 from contraction import *
 
 if __name__ == "__main__":
@@ -65,10 +63,10 @@ if __name__ == "__main__":
             else:
                 print("Belief_base doesn't entail new_belief")
             # check the consistency
-            if entailment_consist(base):
-                print("Belief base is inconsistency")
+            if is_consistent(base):
+                print("Belief base is inconsistent")
             else:
-                print("Belief base is consistency")
+                print("Belief base is consistent")
 
         elif choice == 2:
             print("Contraction of belief base")
