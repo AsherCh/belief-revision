@@ -4,12 +4,12 @@ from sympy.logic.boolalg import to_cnf
 class BeliefBasePriority:
     def __init__(self):
         self.beliefs = []
-        self.neo_beliefs = [] #used to store beliefs after Contraction 
+        #self.neo_beliefs = [] #used to store beliefs after Contraction 
 
     def add_belief(self, belief, priority):
         heapq.heappush(self.beliefs, (priority, belief))
 
-    def add_neo_belief(self, belief, priority):      #to add the remainaing beliefs after Contraction
+    def add_neo_belief(self, belief, priority):      #to add the remainaing beliefs after Contraction version 1
         heapq.heappush(self.neo_beliefs, (priority, belief))
 
     def find_Contracting_belief(self,belief,contract_belief):     # Version 1 of Contraction, which creates a new belief base after contraction
@@ -22,14 +22,14 @@ class BeliefBasePriority:
         return belief
         belief.print_Neo_belief(self,contract_belief) 
 
-    def V2_find_Contracting_belief(self,belief,contract_belief):   # Version 2 of COntraction, which removes the contracting belief and returns the modified belief base
-        for belief in self.beliefs:
-            if belief.is_in_belief_base(contract_belief):
-                belief.remove_belief(self,belief)
-                print(f"The belief {contract_belief} is contracted from the belief base")
-            else:
-                pass
-        return belief       
+    def V2_find_Contracting_belief(self,belief,new_belief):   # Version 2 of COntraction, which removes the contracting belief and returns the modified belief base
+        if self.is_in_belief_base(new_belief):
+            self.string_to_cnf_friendly(new_belief)   #to make the new string cnf frinedly 
+            self.remove_belief(new_belief)
+            print(f"The belief {new_belief} is contracted from the belief base")
+        else:
+            pass
+        return belief      
 
     def remove_belief(self, belief):
         for i, (p, b) in enumerate(self.beliefs):
