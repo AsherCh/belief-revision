@@ -53,14 +53,16 @@ if __name__ == "__main__":
 
         if choice == 1:
             print("Checking for logical entailment")
-            base=[]
+            base = []
             for priority, belief in belief_base.beliefs:
-                    base += [to_cnf(belief)]
+                belief_cnf_friendly = belief_base.string_to_cnf_friendly(belief)
+                base += [to_cnf(belief_cnf_friendly, True)]
             # check for logical entailment
-            if entailment(base,new_belief):   
-                print ("Belief_base can entail new_belief")
+            new_belief_cnf_friendly = belief_base.string_to_cnf_friendly(new_belief)
+            if entailment(base, new_belief_cnf_friendly):
+                print("Belief_base can entail new_belief")
             else:
-                print ("Belief_base doesn't entail new_belief")
+                print("Belief_base doesn't entail new_belief")
 
         elif choice == 2:
             print("Contraction of belief base")
