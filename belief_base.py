@@ -66,7 +66,7 @@ class BeliefBasePriority:
         return cnf
 
     def is_in_belief_base(self, expression):
-        expression_cnf = to_cnf(self.belief_base_to_cnf_friendly(expression), True)
+        expression_cnf = to_cnf(self.string_to_cnf_friendly(expression), True)
         belief_base_cnf = to_cnf(self.belief_base_to_cnf_friendly(self.beliefs), True)
         # cast expression_cnf and belief_base_cnf to string
         expression_cnf = str(expression_cnf)
@@ -93,10 +93,15 @@ class BeliefBasePriority:
         # replace bi-implication with conjunction of implications
         to_convert = self.replace_bi_implication(to_convert)
 
-        # replace implication with disjunction
+        # replace implication
         to_convert = self.replace_implication(to_convert)
 
         return self.belief_base_as_conjunction(to_convert)
+
+    def string_to_cnf_friendly(self, belief):
+        belief = self.string_replace_bi_implication(belief)
+        belief = belief.replace("->", ">>")
+        return belief
 
     def is_subset_of(self, another_belief_base):
         # for each belief in self.beliefs, check if it is in another_belief_base
@@ -122,11 +127,17 @@ class BeliefBasePriority:
 
     def replace_bi_implication(self, belief_base):
         for i, (priority, belief) in enumerate(belief_base):
-            if "<->" in belief:
-                # split bi-implication into two implications
-                a, b = belief.split("<->")
-                belief_base[i] = (priority, f"({a}->{b})&({b}->{a})")
+            belief_base[i] = (priority, self.string_replace_bi_implication(belief))
         return belief_base
+
+    def string_replace_bi_implication(self, belief):
+        if "<->" in belief:
+            # replace first occurrence of "<->" with "->"
+            belief1 = belief.replace("<->", ">>", 1)
+            belief2 = belief.replace("<->", "<<", 1)
+            return "(" + self.string_replace_bi_implication(belief1) + ")&(" + self.string_replace_bi_implication(belief2) + ")"
+        else:
+            return belief
 
     def replace_implication(self, belief_base):
         for i, (priority, belief) in enumerate(belief_base):
