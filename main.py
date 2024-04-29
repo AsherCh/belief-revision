@@ -72,8 +72,15 @@ if __name__ == "__main__":
             print("Contraction of belief base")
             # contraction of belief base
             belief_base = contract(belief_base, new_belief)
-            print("Belief base after contraction:")
             belief_base.print_beliefs()
+            print("Do you want to verify Extensionality? press (y) to verify ")
+            choice = input()
+            if choice == 'y':
+                print("Enter another belief to contract")
+                new_belief2 = get_expression()
+                contracted_belief3 = contract2(belief_base,new_belief,new_belief2)
+            else :
+                print("No extensionality verification")
 
         else:
             # expansion of belief base
