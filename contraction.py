@@ -13,12 +13,14 @@ def contract(belief_base, new_belief):
 
     if belief_base.is_in_belief_base(new_belief):
         contracted_belief = belief_base.V2_find_Contracting_belief(belief_base, new_belief) #version 2 updates exisitng belief base after contraction
-        AGM_check(belief_base, new_belief, contracted_belief)
+
     
     else:
         # else, return the base as it is.
         print("The Belief to Contract is not found in Belief Base")
-        pass
+        contracted_belief = belief_base
+
+    AGM_check(belief_base, new_belief, contracted_belief)
     return belief_base
 
 
