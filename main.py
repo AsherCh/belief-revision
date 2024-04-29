@@ -2,6 +2,7 @@ from Validator import *
 from expansion import *
 from entailment import *
 from contraction import *
+from AGM_postulate_consistency import *
 
 if __name__ == "__main__":
     validator = Validator()
