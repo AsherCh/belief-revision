@@ -1,7 +1,3 @@
-from sympy.logic.boolalg import to_cnf
-from belief_base import *
-
-
 def expand(belief_base, new_belief):
     # check if the new_belief is already in the belief base
     if belief_base.is_in_belief_base(new_belief):

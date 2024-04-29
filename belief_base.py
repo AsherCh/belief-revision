@@ -20,7 +20,6 @@ class BeliefBasePriority:
                 belief.add_neo_belief(self, belief, priority)
                 pass
         return belief
-        belief.print_Neo_belief(self,contract_belief) 
 
     def V2_find_Contracting_belief(self, belief, new_belief):   # Version 2 of COntraction, which removes the contracting belief and returns the modified belief base
         if self.is_in_belief_base(new_belief):

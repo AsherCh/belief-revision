@@ -48,7 +48,6 @@ if __name__ == "__main__":
             text += "expand the belief base with: "
 
         print(text)
-        # this should also validate the input
         new_belief = get_expression()
 
         if choice == 1:
@@ -81,7 +80,3 @@ if __name__ == "__main__":
             belief_base = expand(belief_base, new_belief)
             print("Belief base after expansion:")
             belief_base.print_beliefs()
-
-    #print("the expression you entered is valid", expression)
-
-

@@ -1,4 +1,3 @@
-import sys
 from sympy.logic.boolalg import Or, And
 from sympy.logic.boolalg import to_cnf
 """
