@@ -1,4 +1,4 @@
-from Validator import *
+from validator import *
 from expansion import *
 from entailment import *
 from contraction import *
