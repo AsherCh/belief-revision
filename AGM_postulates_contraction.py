@@ -1,6 +1,3 @@
-#from contraction import contract
-
-
 def is_success(old_belief_base, new_belief,new_belief_base):
     #new_belief_base = contract(old_belief_base, new_belief)
     # Contraction is success if the outcome does not contain the new_belief
@@ -21,9 +18,9 @@ def is_vacuity(old_belief_base, new_belief,new_belief_base):
         # return true if the old and new belief base are the same
         return new_belief_base.is_subset_of(old_belief_base) & old_belief_base.is_subset_of(new_belief_base)
 
-def is_extensionality(new_belief1, new_belief2, old_belief_base):
-    if new_belief1.is_in_belief_base(new_belief2) and new_belief2.is_in_belief_base(new_belief1):
-        new_belief_base1 = contract(old_belief_base, new_belief1)
-        new_belief_base2 = contract(old_belief_base, new_belief2)
-        return new_belief_base1.is_subset_of(new_belief_base2) & new_belief_base2.is_subset_of(new_belief_base1)
+def is_extensionality(new_belief1, new_belief2):
+    if new_belief1==new_belief2:
+        print("Extension is valid")
+    else:
+        print("not valid")
     return True
