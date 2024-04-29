@@ -9,11 +9,11 @@ def contract(belief_base, new_belief):
     for priority, belief in belief_base.beliefs:
         belief_cnf_friendly = belief_base.string_to_cnf_friendly(belief)
         base += [to_cnf(belief_cnf_friendly, True)]
-    print("Consistency checK of belief set:",not is_consistent(base))  #consistency check,
+    print("Consistency check of belief set:", not is_consistent(base))  #consistency check,
 
     if belief_base.is_in_belief_base(new_belief):
-        contracted_belief= belief_base.V2_find_Contracting_belief(belief_base, new_belief) #version 2 updates exisitng belief base after contraction
-        AGM_check(belief_base,new_belief,contracted_belief)
+        contracted_belief = belief_base.V2_find_Contracting_belief(belief_base, new_belief) #version 2 updates exisitng belief base after contraction
+        AGM_check(belief_base, new_belief, contracted_belief)
     
     else:
         # else, return the base as it is.
@@ -22,17 +22,17 @@ def contract(belief_base, new_belief):
     return belief_base
 
 
-def AGM_check(belief_base,new_belief,contracted_belief):
+def AGM_check(belief_base, new_belief, contracted_belief):
     print("AGM postulates verification for Contraction:")  
-    Success_postulate = is_success(belief_base, new_belief,contracted_belief)
-    print("Success Postulate check:",Success_postulate)
-    Inclusion_postulate = is_inclusion(belief_base, new_belief,contracted_belief)
-    print("Inclusion Postulate check:",Inclusion_postulate)
-    Vacuity_postulate= is_vacuity(belief_base, new_belief,contracted_belief)
-    print("Vacuity Postulate check:",Vacuity_postulate)
+    success_postulate = is_success(belief_base, new_belief, contracted_belief)
+    print("Success Postulate check:", success_postulate)
+    inclusion_postulate = is_inclusion(belief_base, new_belief, contracted_belief)
+    print("Inclusion Postulate check:", inclusion_postulate)
+    vacuity_postulate = is_vacuity(belief_base, new_belief, contracted_belief)
+    print("Vacuity Postulate check:", vacuity_postulate)
 
 
 def contract2(belief_base, new_belief, new_belief2):  
-     Extensionality_postulate= is_extensionality(new_belief, new_belief2)
-     print("Extensionality Postulate check:",Extensionality_postulate)
+     extensionality_postulate = is_extensionality(new_belief, new_belief2)
+     print("Extensionality Postulate check:", extensionality_postulate)
      return

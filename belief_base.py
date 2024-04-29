@@ -6,6 +6,9 @@ class BeliefBasePriority:
         self.beliefs = []
         #self.neo_beliefs = [] #used to store beliefs after Contraction 
 
+    def is_empty(self):
+        return len(self.beliefs) == 0
+
     def add_belief(self, belief, priority):
         heapq.heappush(self.beliefs, (priority, belief))
 
@@ -65,6 +68,8 @@ class BeliefBasePriority:
         return cnf
 
     def is_in_belief_base(self, expression):
+        if self.is_empty():
+            return False
         expression_cnf = to_cnf(self.string_to_cnf_friendly(expression), True)
         belief_base_cnf = to_cnf(self.belief_base_to_cnf_friendly(self.beliefs), True)
         # cast expression_cnf and belief_base_cnf to string
